@@ -69,8 +69,8 @@ export default function Index({ reports }: Props) {
         <AppLayout>
             <Head title="My Reports" />
 
-            <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-                <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+            <div className="min-h-screen w-full p-2 bg-zinc-50 dark:bg-zinc-950">
+                <div className="mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
                     {/* Header */}
                     <div className="flex items-start justify-between gap-4 mb-8 sm:mb-10">

@@ -55,18 +55,28 @@ class SendDailyReportJob implements ShouldQueue
             return;
         }
 
+        // Validate primary supervisor email
+        $primaryEmail = $team->primarySupervisor->email;
+        if (!filter_var($primaryEmail, FILTER_VALIDATE_EMAIL)) {
+            Log::error("Report #{$this->report->id}: primary supervisor has invalid email '{$primaryEmail}'. Skipping email.", [
+                'report_id' => $this->report->id,
+                'supervisor_id' => $team->primarySupervisor->id,
+                'email' => $primaryEmail,
+            ]);
+            return;
+        }
+
         $mailable = new DailyReportMail($this->report);
 
         // Build the CC list (all CC supervisors except the primary, to avoid duplicates)
-        $primaryEmail = $team->primarySupervisor->email;
         $ccAddresses  = $team->getCcAddresses();
         $filteredCc   = array_filter(
             $ccAddresses,
-            fn(array $addr) => $addr['email'] !== $primaryEmail
+            fn(array $addr) => $addr['email'] !== $primaryEmail && filter_var($addr['email'], FILTER_VALIDATE_EMAIL)
         );
 
         $mailer = Mail::to([
-            'email' => $team->primarySupervisor->email,
+            'email' => $primaryEmail,
             'name'  => $team->primarySupervisor->name,
         ]);
 
@@ -81,7 +91,7 @@ class SendDailyReportJob implements ShouldQueue
         Log::info("Daily report #{$this->report->id} emailed successfully.", [
             'report_id' => $this->report->id,
             'user'      => $this->report->user->email,
-            'to'        => $team->primarySupervisor->email,
+            'to'        => $primaryEmail,
             'cc_count'  => count($filteredCc),
         ]);
     }

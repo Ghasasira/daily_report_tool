@@ -93,10 +93,10 @@ export default function Create({ todaysReport, hasTeam, teamName }: Props) {
         <AppLayout>
             <Head title="Submit Daily Report" />
 
-            <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+            <div className="min-h-screen w-full p-2 bg-zinc-50 dark:bg-zinc-950">
                 {/* Top banner */}
                 <div className="bg-white dark:bg-zinc-900 border-b border-zinc-200 dark:border-zinc-800">
-                    <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
+                    <div className="w-full mx-auto px-4 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                         <div className="flex items-center gap-3">
                             <div className="w-8 h-8 rounded-lg bg-zinc-900 dark:bg-zinc-100 flex items-center justify-center flex-shrink-0">
                                 <ClipboardList className="w-4 h-4 text-white dark:text-zinc-900" />
@@ -117,7 +117,7 @@ export default function Create({ todaysReport, hasTeam, teamName }: Props) {
                     </div>
                 </div>
 
-                <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
+                <div className="w-full mx-auto px-4 sm:px-6 py-8 sm:py-12">
                     {/* Progress strip */}
                     <div className="hidden sm:flex items-center gap-1 mb-10">
                         {sections.map((s, i) => (
@@ -247,7 +247,7 @@ export default function Create({ todaysReport, hasTeam, teamName }: Props) {
 function PageShell({ children }: { children: React.ReactNode }) {
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
-            <div className="max-w-2xl mx-auto px-4 sm:px-6 py-10 sm:py-14">
+            <div className=" mx-auto px-4 sm:px-6 py-10 sm:py-14">
                 {children}
             </div>
         </div>

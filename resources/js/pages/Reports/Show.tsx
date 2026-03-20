@@ -61,7 +61,7 @@ export default function Show({ report }: Props) {
         <AppLayout>
             <Head title={`Report — ${formatDate(report.report_date)}`} />
 
-            <div className="min-h-screen bg-zinc-50 dark:bg-zinc-950">
+            <div className="min-h-screen w-full p-2 bg-zinc-50 dark:bg-zinc-950">
                 <div className="max-w-3xl mx-auto px-4 sm:px-6 py-8 sm:py-12">
 
                     {/* Back nav */}

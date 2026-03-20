@@ -1,4 +1,4 @@
-import { Link } from '@inertiajs/react';
+import { Link, usePage } from '@inertiajs/react';
 import { LayoutGrid } from 'lucide-react';
 import AppLogo from '@/components/app-logo';
 // import { NavFooter } from '@/components/nav-footer';
@@ -19,7 +19,7 @@ import users from '@/routes/users';
 import type { NavItem } from '@/types';
 import { dashboard } from '@/routes';
 
-const mainNavItems: NavItem[] = [
+const adminNavItems: NavItem[] = [
     {
         title: 'Dashboard',
         href: dashboard(),
@@ -42,8 +42,25 @@ const mainNavItems: NavItem[] = [
     }
 ];
 
+const generalUserNavItems: NavItem[] = [
+    {
+        title: 'Dashboard',
+        href: dashboard(),
+        icon: LayoutGrid,
+    },
+    {
+        title: 'Reports',
+        href: reports.index.url(),
+        icon: LayoutGrid,
+    }
+];
+
 
 export function AppSidebar() {
+    const { auth } = usePage().props;
+    const isGeneralUser = auth.user.role === 'general';
+    const navItems = isGeneralUser ? generalUserNavItems : adminNavItems;
+
     return (
         <Sidebar collapsible="icon" variant="inset">
             <SidebarHeader>
@@ -59,7 +76,7 @@ export function AppSidebar() {
             </SidebarHeader>
 
             <SidebarContent>
-                <NavMain items={mainNavItems} />
+                <NavMain items={navItems} />
             </SidebarContent>
 
             <SidebarFooter>
