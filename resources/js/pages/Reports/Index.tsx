@@ -9,7 +9,7 @@ interface Report {
     tasks_handled: string[];
     tasks_completed: string[];
     challenges: string | null;
-    email_status: 'pending' | 'sent' | 'failed';
+    email_status: 'pending' | 'sent' | 'failed' | 'draft';
     created_at: string;
 }
 
@@ -43,6 +43,12 @@ const EMAIL_STATUS = {
         label: 'Failed',
         className: 'text-red-600 dark:text-red-400',
         dot: 'bg-red-500',
+    },
+    draft: {
+        icon: FileText,
+        label: 'Draft',
+        className: 'text-zinc-600 dark:text-zinc-400',
+        dot: 'bg-zinc-500',
     },
 } as const;
 

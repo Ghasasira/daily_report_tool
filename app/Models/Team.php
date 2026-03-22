@@ -86,11 +86,17 @@ class Team extends Model
     /**
      * Collect all CC email addresses for this team.
      *
+     * Uses ccSupervisors() (method call) so the WHERE constraint that excludes
+     * the primary supervisor is applied in SQL. Accessing $this->ccSupervisors
+     * (property) on an already-loaded relationship would bypass that constraint
+     * and could include the primary supervisor in the CC list.
+     *
      * @return array<int, array{email: string, name: string}>
      */
     public function getCcAddresses(): array
     {
-        return $this->ccSupervisors
+        return $this->ccSupervisors()
+            ->get()
             ->map(fn(User $user) => [
                 'email' => $user->email,
                 'name'  => $user->name,

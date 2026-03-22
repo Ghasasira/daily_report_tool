@@ -36,7 +36,7 @@ interface MemberStat {
 interface RecentReport {
     id: number;
     report_date: string;
-    email_status: 'pending' | 'sent' | 'failed';
+    email_status: 'pending' | 'sent' | 'failed' | 'draft';
     tasks_handled: number;
     tasks_completed: number;
     user: { id: number; name: string; email: string };
@@ -76,6 +76,7 @@ const EMAIL_STATUS = {
     sent:    { icon: CheckCircle, label: 'Sent',    cls: 'text-emerald-500' },
     pending: { icon: Clock,       label: 'Pending', cls: 'text-amber-500'   },
     failed:  { icon: XCircle,     label: 'Failed',  cls: 'text-red-500'     },
+    draft:   { icon: FileText,    label: 'Draft',   cls: 'text-zinc-500'    },
 };
 
 /* ─── Page ──────────────────────────────────────────────────────────────── */

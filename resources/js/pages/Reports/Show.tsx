@@ -1,5 +1,5 @@
 import { Head, Link } from '@inertiajs/react';
-import { ArrowLeft, CheckCircle, Clock, XCircle, Mail, Calendar, User } from 'lucide-react';
+import { ArrowLeft, CheckCircle, Clock, XCircle, Mail, Calendar, User, FileText } from 'lucide-react';
 import AppLayout from '@/layouts/app-layout';
 import reports from '@/routes/reports';
 
@@ -11,7 +11,7 @@ interface Report {
     challenges: string | null;
     next_day_plan: string | null;
     additional_notes: string | null;
-    email_status: 'pending' | 'sent' | 'failed';
+    email_status: 'pending' | 'sent' | 'failed' | 'draft';
     email_sent_at: string | null;
     created_at: string;
     user: { name: string; email: string };
@@ -37,6 +37,11 @@ const EMAIL_BADGE = {
         icon: XCircle,
         label: 'Email delivery failed',
         className: 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300',
+    },
+    draft: {
+        icon: FileText,
+        label: 'Draft saved',
+        className: 'bg-zinc-50 dark:bg-zinc-950/40 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300',
     },
 } as const;
 

@@ -21,7 +21,7 @@ class ReportDispatchService
 
         return [
             'dispatched' => $reports->count(),
-            'date' => $date,
+            'date'       => $date,
         ];
     }
 
@@ -30,23 +30,39 @@ class ReportDispatchService
         $results = collect();
 
         $currentDate = Carbon::parse($startDate);
-        $endDate = Carbon::parse($endDate);
+        $end         = Carbon::parse($endDate);
 
-        while ($currentDate->lte($endDate)) {
+        while ($currentDate->lte($end)) {
+            $dateString = $currentDate->toDateString();
+
             $results->put(
-                $currentDate->toDateString(),
-                $this->dispatchForDate($currentDate->toDateString())
+                $dateString,
+                $this->dispatchForDate($dateString)
             );
+
             $currentDate->addDay();
         }
 
         return $results;
     }
 
+    /**
+     * Fetch reports for the given date that have not yet had an email sent.
+     *
+     * Previously this method ignored the $date parameter entirely, causing
+     * every dispatch call to retry ALL unsent reports across all dates.
+     */
     protected function getPendingReports(string $date): Collection
     {
         return Report::query()
+            ->whereDate('report_date', $date)
             ->whereNull('email_sent_at')
+            ->where(fn($q) => $q
+                ->where('email_status', 'pending')
+                ->orWhereNull('email_status')
+                ->orWhere('email_status', 'failed')  // allow retry of previously failed reports
+            )
+            ->with(['user', 'team'])
             ->get();
     }
 }

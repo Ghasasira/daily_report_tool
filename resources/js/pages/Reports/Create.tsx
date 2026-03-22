@@ -12,7 +12,7 @@ interface TodaysReport {
     challenges: string | null;
     next_day_plan: string | null;
     additional_notes: string | null;
-    email_status: 'pending' | 'sent' | 'failed';
+    email_status: 'pending' | 'sent' | 'failed' | 'draft';
     created_at: string;
 }
 
@@ -28,6 +28,7 @@ type ReportFormData = {
     challenges: string;
     next_day_plan: string;
     additional_notes: string;
+    is_draft: boolean;
 };
 
 const today = new Date().toLocaleDateString('en-US', {
@@ -46,20 +47,28 @@ const shortDate = new Date().toLocaleDateString('en-US', {
 export default function Create({ todaysReport, hasTeam, teamName }: Props) {
     const { flash } = usePage<{ flash: { success?: string } }>().props;
 
-    const { data, setData, post, processing, errors } = useForm<ReportFormData>({
-        tasks_handled: [],
-        tasks_completed: [],
-        challenges: '',
-        next_day_plan: '',
-        additional_notes: '',
+    const { data, setData, post, processing, errors, transform } = useForm<ReportFormData>({
+        tasks_handled: todaysReport?.tasks_handled || [],
+        tasks_completed: todaysReport?.tasks_completed || [],
+        challenges: todaysReport?.challenges || '',
+        next_day_plan: todaysReport?.next_day_plan || '',
+        additional_notes: todaysReport?.additional_notes || '',
+        is_draft: false,
     });
 
-    const submit = (e: React.SubmitEvent) => {
+    let submitIsDraft = false;
+
+    transform((data) => ({
+        ...data,
+        is_draft: submitIsDraft,
+    }));
+
+    const submit = (e: React.FormEvent) => {
         e.preventDefault();
         post(reports.store.url());
     };
 
-    if (todaysReport) {
+    if (todaysReport && todaysReport.email_status !== 'draft') {
         return (
             <AppLayout>
                 <Head title="Daily Report" />
@@ -224,16 +233,33 @@ export default function Create({ todaysReport, hasTeam, teamName }: Props) {
                         {/* Submit bar */}
                         <div className="mt-6 sm:mt-8 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl px-5 sm:px-6 py-4 sm:py-5 flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
                             <p className="text-xs text-zinc-500 dark:text-zinc-400 max-w-sm">
-                                Your report will be emailed to your supervisor immediately after submission.
+                                You can save your draft and add to it throughout the day. When finalized, submit and send the email.
                             </p>
-                            <button
-                                type="submit"
-                                disabled={processing || data.tasks_handled.length === 0}
-                                className="flex items-center justify-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-xl hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition w-full sm:w-auto"
-                            >
-                                <Send className="w-4 h-4" />
-                                {processing ? 'Submitting…' : 'Submit report'}
-                            </button>
+                            <div className="flex flex-col sm:flex-row items-center gap-3 w-full sm:w-auto">
+                                <button
+                                    type="submit"
+                                    onClick={() => { submitIsDraft = true; }}
+                                    disabled={processing || data.tasks_handled.length === 0}
+                                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-700 text-zinc-900 dark:text-zinc-100 text-sm font-semibold rounded-xl hover:bg-zinc-50 dark:hover:bg-zinc-800 disabled:opacity-40 disabled:cursor-not-allowed transition w-full sm:w-auto"
+                                >
+                                    Save Draft
+                                </button>
+                                <button
+                                    type="submit"
+                                    onClick={(e) => {
+                                        if (!confirm('Are you sure you want to finalize and send this report? You will not be able to edit it afterwards.')) {
+                                            e.preventDefault();
+                                            return;
+                                        }
+                                        submitIsDraft = false;
+                                    }}
+                                    disabled={processing || data.tasks_handled.length === 0}
+                                    className="flex items-center justify-center gap-2 px-6 py-2.5 bg-zinc-900 dark:bg-zinc-100 text-white dark:text-zinc-900 text-sm font-semibold rounded-xl hover:bg-zinc-700 dark:hover:bg-zinc-300 disabled:opacity-40 disabled:cursor-not-allowed transition w-full sm:w-auto"
+                                >
+                                    <Send className="w-4 h-4" />
+                                    {processing ? 'Submitting…' : 'Submit & Send Email'}
+                                </button>
+                            </div>
                         </div>
                     </form>
                 </div>
@@ -257,10 +283,10 @@ function PageShell({ children }: { children: React.ReactNode }) {
 /* ─── FormCard ──────────────────────────────────────────────────────────── */
 
 const accentMap: Record<string, string> = {
-    zinc:  'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400',
+    zinc: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-500 dark:text-zinc-400',
     green: 'bg-emerald-50 dark:bg-emerald-950/50 text-emerald-600 dark:text-emerald-400',
     amber: 'bg-amber-50 dark:bg-amber-950/50 text-amber-600 dark:text-amber-400',
-    blue:  'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400',
+    blue: 'bg-blue-50 dark:bg-blue-950/50 text-blue-600 dark:text-blue-400',
 };
 
 function FormCard({
@@ -320,6 +346,10 @@ function AlreadySubmitted({ report, teamName }: { report: TodaysReport; teamName
         failed: {
             bar: 'bg-red-50 dark:bg-red-950/40 border-red-200 dark:border-red-800 text-red-700 dark:text-red-300',
             label: 'Email delivery failed — contact your admin',
+        },
+        draft: {
+            bar: 'bg-zinc-50 dark:bg-zinc-950/40 border-zinc-200 dark:border-zinc-800 text-zinc-700 dark:text-zinc-300',
+            label: 'Draft saved (not sent)',
         },
     };
 

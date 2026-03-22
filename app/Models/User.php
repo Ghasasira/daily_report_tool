@@ -132,6 +132,7 @@ class User extends Authenticatable
     {
         return $this->reports()
             ->whereDate('report_date', today())
+            ->where('email_status', '!=', 'draft')
             ->exists();
     }
 

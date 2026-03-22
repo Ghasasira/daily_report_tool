@@ -22,6 +22,7 @@ class StoreReportRequest extends FormRequest
             'challenges'               => ['nullable', 'string', 'max:2000'],
             'next_day_plan'            => ['nullable', 'string', 'max:2000'],
             'additional_notes'         => ['nullable', 'string', 'max:2000'],
+            'is_draft'                 => ['nullable', 'boolean'],
         ];
     }
 
