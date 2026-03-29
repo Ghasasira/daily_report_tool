@@ -124,6 +124,7 @@ class SendDailyReportJob implements ShouldQueue
 
         Log::error("Failed to send daily report #{$this->report->id}: {$exception->getMessage()}", [
             'report_id' => $this->report->id,
+            'user'      => $this->report->user->email,
             'exception' => $exception,
         ]);
     }
